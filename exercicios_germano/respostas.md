@@ -56,3 +56,36 @@ O erro semântico aqui é porque, apesar de sintaticamente correto, estamos decl
 ```bison
 
 ```
+## C4
+- Explique a diferença entre busca(), buscaLocal() e resolve() e onde cada uma é usada em mini.y.
+  buscaLocal busca o identificador na tabela de simbolos apenas dentro do escopo atual, ao contrário de busca que itera os escopos do mais interno ao mais externo para encontrar esse identificador (retorna o mais proximo). resolve realiza a busca e registra no trace, utilizada exclusivamente ao usar o identificador, diferente de busca e buscaLocal que são usados ao declarar valores.
+- Nesta versão só existem variáveis globais: quais escopos são abertos durante a análise de ok.mini e quantos podem estar abertos ao mesmo tempo? Por que, ainda assim, a pilha de escopos foi mantida?
+  Existem 6 escopos diferentes no programa ok.mini:
+    1. escopo global, no nivel 0
+    2. escopo da função main, no nivel 1
+    3. escopo do primeiro while, nivel 2 (todos de nivel 2 pra cima estao dentro do escopo de main)
+    4. escopo do segundo while, nivel 3 dentro do while anterior
+    5. escopo do terceiro while, nivel 2
+    6. escopo do if, nivel 2
+  Na execução de ok.mini apenas 4 escopos ficam abertos ao mesmo tempo (global -> main -> while -> while), porém a linguagem permite N escopos. A pilha de escopos foi mantida para futuramente implementarmos declarações locais.
+
+## C5
+- Em que situação declara() emite erro e em que situação emite aviso de ocultação?
+  Ao tentar redeclarar uma variável já declarada no escopo atual
+
+- É possível obter um aviso de ocultação nesta versão da linguagem? Justifique com o código.
+  Não, pois a versão atual não suporta declarações fora de escopo global. As evidências podem ser vistas tanto num programa exemplo (abaixo), quanto na própria gramática que não suporta listas de declaração dentro de escopos não globais, o que justifica o erro sintático e não semântico do exemplo abaixo:
+```bash
+λ ~/org/pucrs/CC/mini-global-byaccj/ main* cat exercicios_germano/exercicios/C5.mini
+int val;
+
+void main() {
+    int val = 0;
+}
+λ ~/org/pucrs/CC/mini-global-byaccj/ main* java Parser exercicios_germano/exercicios/C5.mini
+Picked up _JAVA_OPTIONS: -Dsun.java2d.uiScale=2
+Linha 4: erro sintático (syntax error)
+Linha 4: erro sintático (stack underflow. aborting...)
+2 erro(s) encontrado(s).
+λ ~/org/pucrs/CC/mini-global-byaccj/ main*
+```
