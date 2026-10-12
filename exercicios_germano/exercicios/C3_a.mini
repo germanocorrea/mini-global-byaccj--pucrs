@@ -1,3 +1,5 @@
 int a;
+$MOSTRA_TS
+$TRACE_ON
 void main() { a = 1; }
 int b;

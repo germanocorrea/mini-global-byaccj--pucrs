@@ -28,6 +28,7 @@ O que declaram a seguir?
 ## C3
 
 - Explique a estrutura de um programa imposta pelas produções programa, globais, decl_main e finais.
+  A produção `programa` define a estrutura do programa em si, dizendo que  ela é composta de uma lista de declarações globais, da função main, e de diretivas finais. A lista de declaração de globais pode conter declaração de variáveis ou diretivas (sendo diretivas opções de debugging relacionadas ao trace do programa e a pilha de escopos). A função main é a computação do programa em si, onde as variáveis globais são utilizadas e onde o resto das estruturas do programa também são usadas. Por fim, a produção final apenas permite a declaração opcional das diretivas (as mesmas que podemos declarar antes da função main).
 
 - Execute os dois programas abaixo e explique por que um gera erro sintático e o outro erro semântico.
 ```bash
@@ -36,6 +37,10 @@ Picked up _JAVA_OPTIONS: -Dsun.java2d.uiScale=2
 Linha 3: erro sintático (syntax error)
 Linha 3: erro sintático (stack underflow. aborting...)
 2 erro(s) encontrado(s).
+```
+Este gera erro sitnático pois há uma declaração de variável global depois da main, e como vimos, as declarações devem ser feitas antes. O erro de sintaxe existe porque depois de `decl_main`, não há produção que suporte `decl_var` mais.
+
+```bash
 λ ~/org/pucrs/CC/mini-global-byaccj/exercicios_germano/ main* java Parser exercicios/C3_b.mini
 Picked up _JAVA_OPTIONS: -Dsun.java2d.uiScale=2
 Linha 2: erro: nesta versão só é permitida a função 'main' (encontrado 'f')
@@ -43,4 +48,11 @@ Linha 3: erro: programa sem função 'main'
 2 erro(s) encontrado(s).
 ```
 
-Qual dos dois tipos de mensagem é mais útil para o programador? Como a gramática poderia ser alterada para que o programa (a) recebesse uma mensagem semântica clara?
+O erro semântico aqui é porque, apesar de sintaticamente correto, estamos declarando uma função `f` quando o programa suporta apenas declaração da função `main`. O segundo erro semântico é justamente a falta de uma função `main`.
+
+- Qual dos dois tipos de mensagem é mais útil para o programador? Como a gramática poderia ser alterada para que o programa (a) recebesse uma mensagem semântica clara?
+  O segundo contém mais informações sobre o erro. O primeiro simplesmente não informa que existe uma estrutura não suportada depois da declaração da main.
+  <!-- WIP: nao sei :( -->
+```bison
+
+```
