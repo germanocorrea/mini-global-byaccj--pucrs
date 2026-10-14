@@ -104,6 +104,18 @@ Para a declaração “int a, t[2][5], b;”, mostre o valor do atributo de dims
 Desenhe a árvore da expressão de tipo construída para “double m[3][4]” e para “int c[2][3][4]”. Explique por que o laço de declaraVars() percorre as dimensões da última para a primeira. Quais são os valores de dimensoes(), base() e toString() para c, c.elem e c.elem.elem?
 Referência: Tipo.java (array, dimensoes, base, toString); mini.y — declaraVars()
 
+array(3)                    array(2)
+   |                            |
+array(4)                    array(3)
+   |                            |
+double                     array(4)
+                                |                               
+                               int
+O laço percorre da última pra primeira pois a função é feita de dentro pra fora, o array tem o elemento que precisa aparecer antes dele preservando a ordem correta das dimensões
+Para c os valores de dimensoes(), base() e toString() são respectivamente 3, int e "int[2][3][4]"
+Para c.elem os valores de dimensoes(), base() e toString() são respectivamente 2, int e "int[3][4]"
+Para c.elem.elem os valores de dimensoes(), base() e toString() são respectivamente 1, int e "int[4]"
+
 ## C8
 Acompanhe indexa() para m[i][j], m[1] e m[1][2][0] (com double m[3][4]) e para v[d] (com int v[5] e double d), indicando o tipo devolvido ou a mensagem. Em seguida, explique as mensagens das linhas 14 a 19 de exemplos/erros.mini. Por que a indexação parcial m[1] é aceita em uma expressão, mas não como alvo de atribuição?
 Referência: mini.y — indexa(), atribui(); erros.mini linhas 14–19
@@ -131,6 +143,12 @@ Referência: mini.y — bloco, corpo
 ## C14
 Identifique no código os métodos, campos e valores de enumeração que existem mas não são usados (ou nunca recebem dados) nesta versão. Para cada um, explique que papel teria em uma versão com funções, parâmetros e variáveis locais.
 Referência: mini.y — seção “RESERVADO PARA FUTURAS IMPLEMENTAÇÕES”; Simbolo.java
+
+Classe.VAR_LOCAL : o campo desse operador nunca é executado no declaraVars, pois nessa versão enxuta, só temos declaracoes globais. Em uma versão completa esse operador funciona para marcar variáveis declaradas dentro de funcõess e blocos específicos, elas são registradas na memória de maneiras diferentes, as globais ficam em enderecos estáticos e as locais em pilhas.
+PARAM: só é referênciado dentro de declaraParam, que foi guardado para implementacões futuras. Ou seja, nunca é chamado. Em uma versão completa, esse PARAM funciona para classificar parametros formais, ele permite com que o código reconheca se o parâmetro foi redeclarado como local.
+List<Tipo> params: mais uma vez esse é só usado por declaraParam, fazendo params.add(). Portanto, se declaraParam nao é usada a lista fica sempre vazia. Para uma versão completa essa lista guardaria a assinatura das funcões.
+DeclaraParam: nada na gramática chama ele. Ele tem o papel de completar a assinatura das funcões e coloca o parametro como símbulo no escopo da funcão.
+Chama: é uma funcão que também não temos nada existente como producão em expr para esse metodo. Ele verifica as chamadas analizando se é funcão, os argumentos etc, funcionando para evitar erros.
 
 # Parte D
 
