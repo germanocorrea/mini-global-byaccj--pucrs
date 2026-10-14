@@ -52,9 +52,12 @@ O erro semântico aqui é porque, apesar de sintaticamente correto, estamos decl
 
 - Qual dos dois tipos de mensagem é mais útil para o programador? Como a gramática poderia ser alterada para que o programa (a) recebesse uma mensagem semântica clara?
   O segundo contém mais informações sobre o erro. O primeiro simplesmente não informa que existe uma estrutura não suportada depois da declaração da main.
-  <!-- WIP: nao sei :( -->
-```bison
-
+  Uma mudança seria uma produção nova em finais que aceita declaração de variáveis, mas larga um erro semântico. Assim, o parsing aceita a declaração mas emite um erro melhor.
+```yacc
+finais : /* vazio */
+       | finais diretiva
+       | finais decl_var   { erro("declarações globais devem vir antes de 'main'"); }
+       ;
 ```
 ## C4
 - Explique a diferença entre busca(), buscaLocal() e resolve() e onde cada uma é usada em mini.y.
@@ -93,28 +96,38 @@ Linha 4: erro sintático (stack underflow. aborting...)
 ## C6
 Para a declaração “int a, t[2][5], b;”, mostre o valor do atributo de dims_decl e de lista_ids após cada redução e diga em que momento os três símbolos são inseridos na tabela. Esses atributos são herdados ou sintetizados?
 
+- dims_decl: 
+- lista_ids:
+
 
 ## C7
 Desenhe a árvore da expressão de tipo construída para “double m[3][4]” e para “int c[2][3][4]”. Explique por que o laço de declaraVars() percorre as dimensões da última para a primeira. Quais são os valores de dimensoes(), base() e toString() para c, c.elem e c.elem.elem?
 Referência: Tipo.java (array, dimensoes, base, toString); mini.y — declaraVars()
+
 ## C8
 Acompanhe indexa() para m[i][j], m[1] e m[1][2][0] (com double m[3][4]) e para v[d] (com int v[5] e double d), indicando o tipo devolvido ou a mensagem. Em seguida, explique as mensagens das linhas 14 a 19 de exemplos/erros.mini. Por que a indexação parcial m[1] é aceita em uma expressão, mas não como alvo de atribuição?
 Referência: mini.y — indexa(), atribui(); erros.mini linhas 14–19
+
 ## C9
 Calcule o resultado de igual() para os pares (int[3][4], int[5][4]), (int[3][4], int[3][5]) e (int[3], int[3][4]). Que regra de equivalência isso representa? Em que métodos igual() é usado nesta versão e por que, na prática, ele quase nunca é chamado com arranjos?
 Referência: Tipo.igual(), Tipo.atribuivelA()
+
 ## C10
 Para a condição “m[2][3] > 10.5 && !achou” de ok.mini, liste em ordem os métodos de verificação chamados durante o parsing e o tipo devolvido por cada um, até checaCond().
 Referência: mini.y — regras de expr; ok.mini
+
 ## C11
 No trace de tabela.mini, a linha 11 (“m[1][n] = v[n] * 1.5;”) produz resolve n, resolve n, resolve v e só então resolve m. Explique por que m, que aparece primeiro no texto, é resolvido por último.
 Referência: make tabela; exemplos/tabela.mini linha 11
+
 ## C12
 Por que laco é um contador e não um boolean? Como checaReturn() sabe que “return 1;” é inválido em main? Que parte desse código só fará diferença quando a linguagem tiver outras funções?
 Referência: mini.y — cmd (WHILE, BREAK, RETURN), checaReturn(), funcAtual
+
 ## C13
 A produção bloco abre um escopo novo, mas nesta versão nada pode ser declarado dentro dele. Isso é um erro de projeto? Compare bloco com corpo e diga o que acontece na tabela, segundo o trace, ao entrar e sair de um bloco.
 Referência: mini.y — bloco, corpo
+
 ## C14
 Identifique no código os métodos, campos e valores de enumeração que existem mas não são usados (ou nunca recebem dados) nesta versão. Para cada um, explique que papel teria em uma versão com funções, parâmetros e variáveis locais.
 Referência: mini.y — seção “RESERVADO PARA FUTURAS IMPLEMENTAÇÕES”; Simbolo.java
