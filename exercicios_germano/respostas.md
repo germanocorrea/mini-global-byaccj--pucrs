@@ -159,9 +159,79 @@ Chama: é uma funcão que também não temos nada existente como producão em ex
   3. A terceira MOSTRA_TS representa o estado final da tabela de simbolos quando o programa esta terminando de executar. Só possui o escopo global pois é chamada fora da main. A tabela de simbolos do escopo global é igual a tabela de simbolos do escopo da segunda MOSTRA_TS porque não há mudança, não se remove declarações globais. Vale lembrar que essa versão da mini só suporta declarações globais.
 
 ## D2
-Antes de executar, preveja o tipo de cada expressão ou a mensagem de erro do programa abaixo. Depois execute e compare. Explique qualquer diferença entre a previsão e o resultado.
-int c[2][3][4];int x;double d;void main() {x = c[1][2][3];d = c[1][2][3] / 2;x = c[1][2];x = c[1][2][3][0];c[0][0][0] = d;x = c[x][x][x] + c[0][0];}
-Referência: Tipo.java; mini.y — indexa(), aritmetico(), atribui()
+- Antes de executar, preveja o tipo de cada expressão ou a mensagem de erro do programa abaixo. Depois execute e compare. Explique qualquer diferença entre a previsão e o resultado.
+  ```mini
+int c[2][3][4];
+int x;
+double d;
+void main() {
+  x = c[1][2][3];
+  d = c[1][2][3] / 2;
+  x = c[1][2];
+  x = c[1][2][3][0];
+  c[0][0][0] = d;
+  x = c[x][x][x] + c[0][0];
+}
+```
+  Previsao:
+```mini
+int c[2][3][4]; // matriz de 3 dimensoes de inteiros
+int x; // valor inteiro
+double d; // valor double
+void main() { // funcao main com retorno void
+  x = c[1][2][3]; // obtem o inteiro salvo na matriz c no indice [1][2][3] e salva na variavel inteira x
+  d = c[1][2][3] / 2; // divide o mesmo inteiro acima por 2, o resultado é um double e é salvo em uma variável double
+  x = c[1][2]; // aqui daria erro, pois c[1][2] é um array de inteiros, não um inteiro, e esta tentando-se salvar esse valor em uma variável inteira
+  x = c[1][2][3][0]; // aqui da erro também, porque a matriz só tem 3 dimensoes e aqui tenta-se acessar 4
+  c[0][0][0] = d; // aqui da erro pois tenta-se atribuir um double d em uma posicao de inteiro na matriz c
+  x = c[x][x][x] + c[0][0]; // as últimas tentativas de atribuir x falharam, então provavelmente não deve chegar aqui - se chega aqui, x sendo inteiro é válido para acessar indices, mas em runtime pode ser um inteiro maior que o suportado para c e falhar com isso. indice [0][0] para c nao existe, o que também da erro. A soma entao nem existiria por conta dos erros pois estariamos somando dois valores invalidos que nao sao numericos necessariamente.
+}
+```
+
+Resultado de rodar:
+```bash
+λ ~/org/pucrs/CC/mini-global-byaccj/ main* java Parser -v -t  exercicios_germano/exercicios/D2.mini
+Picked up _JAVA_OPTIONS: -Dsun.java2d.uiScale=2
+[ts] linha   1  abre escopo 'global' (nível 0)
+[ts] linha   1  insere c : VAR_GLOBAL int[2][3][4] no escopo 'global'
+[ts] linha   2  insere x : VAR_GLOBAL int no escopo 'global'
+[ts] linha   3  insere d : VAR_GLOBAL double no escopo 'global'
+[ts] linha   4  insere main : FUNCAO (retorno void) no escopo 'global'
+[ts] linha   4    abre escopo 'função main' (nível 1)
+[ts] linha   5    resolve c → c@1  (VAR_GLOBAL int[2][3][4], nível 0)
+[ts] linha   5    resolve x → x@2  (VAR_GLOBAL int, nível 0)
+[ts] linha   6    resolve c → c@1  (VAR_GLOBAL int[2][3][4], nível 0)
+[ts] linha   6    resolve d → d@3  (VAR_GLOBAL double, nível 0)
+[ts] linha   7    resolve c → c@1  (VAR_GLOBAL int[2][3][4], nível 0)
+[ts] linha   7    resolve x → x@2  (VAR_GLOBAL int, nível 0)
+Linha 7: erro: tipos incompatíveis na atribuição a 'x': esperado int, encontrado int[4]
+[ts] linha   8    resolve c → c@1  (VAR_GLOBAL int[2][3][4], nível 0)
+Linha 8: erro: 'c' tem 3 dimensão(ões), mas foi indexado com 4 índice(s)
+[ts] linha   8    resolve x → x@2  (VAR_GLOBAL int, nível 0)
+[ts] linha   9    resolve d → d@3  (VAR_GLOBAL double, nível 0)
+[ts] linha   9    resolve c → c@1  (VAR_GLOBAL int[2][3][4], nível 0)
+Linha 9: erro: tipos incompatíveis na atribuição a 'c': esperado int, encontrado double
+[ts] linha  10    resolve x → x@2  (VAR_GLOBAL int, nível 0)
+[ts] linha  10    resolve x → x@2  (VAR_GLOBAL int, nível 0)
+[ts] linha  10    resolve x → x@2  (VAR_GLOBAL int, nível 0)
+[ts] linha  10    resolve c → c@1  (VAR_GLOBAL int[2][3][4], nível 0)
+[ts] linha  10    resolve c → c@1  (VAR_GLOBAL int[2][3][4], nível 0)
+Linha 10: erro: operador '+' não se aplica a int e int[4]
+[ts] linha  10    resolve x → x@2  (VAR_GLOBAL int, nível 0)
+  ┌─ fechando escopo 'função main' (nível 1)
+  └─
+[ts] linha  11    fecha escopo 'função main' (nível 1) — 0 símbolo(s) descartado(s)
+  ┌─ fechando escopo 'global' (nível 0)
+  │ c        VAR_GLOBAL int[2][3][4]           nível 0  (linha 1)
+  │ x        VAR_GLOBAL int                    nível 0  (linha 2)
+  │ d        VAR_GLOBAL double                 nível 0  (linha 3)
+  │ main     FUNCAO     [] -> void             nível 0  (linha 4)
+  └─
+[ts] linha  12  fecha escopo 'global' (nível 0) — 4 símbolo(s) descartado(s)
+4 erro(s) encontrado(s).
+```
+
+A previsão foi certeira, mas acabo se aprofundando muito na linha 10, ao passo que o erro era simplesmente que o operador + não podia se aplicar a int e int[4], acabamos analisando erros que seriam de runtime também.
 
 ## D3
 Permita a declaração de variáveis locais no início de main e dentro de blocos, alterando apenas a gramática. Mostre a alteração, execute make conflitos e teste com o programa abaixo, explicando cada aviso e a tabela mostrada pelo $MOSTRA_TS.
