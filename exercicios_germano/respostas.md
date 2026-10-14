@@ -131,3 +131,26 @@ Referência: mini.y — bloco, corpo
 ## C14
 Identifique no código os métodos, campos e valores de enumeração que existem mas não são usados (ou nunca recebem dados) nesta versão. Para cada um, explique que papel teria em uma versão com funções, parâmetros e variáveis locais.
 Referência: mini.y — seção “RESERVADO PARA FUTURAS IMPLEMENTAÇÕES”; Simbolo.java
+
+# Parte D
+
+## D1
+- Execute make tabela e explique cada uma das três impressões produzidas por $MOSTRA_TS: por que a primeira não contém fim nem main, por que a segunda mostra três escopos (dois vazios) e o que a terceira representa. Relacione com as linhas “abre escopo” e “fecha escopo” do trace.
+  1. A primeira não contém fim nem main pois ambos foram declarados apenas depois do primeiro MOSTRA_TS. Apenas n, v e m foram declaradas antes.
+  2. Sobre os escopos da segunda MOSTRA_TS: o nivel 2 é o escopo mais interno, de um bloco iniciado na linha 10. Ele é vazio pois não há nenhuma declaração de variável nele. O nivel 1 é da função main, ela também não possui nenhuma declaração de variável e por isso é vazia. O último é o escopo global, nivel 0, onde todas declarações foram feitas. Nenhum escopo foi fechado no segundo MOSTRA_TS, apenas aberto: há print de 2, o de nível 1 e de nível 2. O nível 0 não exibe abertura de escopo, pois ele nunca é "aberto" de fato, ele simplesmente já existe.
+  3. A terceira MOSTRA_TS representa o estado final da tabela de simbolos quando o programa esta terminando de executar. Só possui o escopo global pois é chamada fora da main. A tabela de simbolos do escopo global é igual a tabela de simbolos do escopo da segunda MOSTRA_TS porque não há mudança, não se remove declarações globais. Vale lembrar que essa versão da mini só suporta declarações globais.
+
+## D2
+Antes de executar, preveja o tipo de cada expressão ou a mensagem de erro do programa abaixo. Depois execute e compare. Explique qualquer diferença entre a previsão e o resultado.
+int c[2][3][4];int x;double d;void main() {x = c[1][2][3];d = c[1][2][3] / 2;x = c[1][2];x = c[1][2][3][0];c[0][0][0] = d;x = c[x][x][x] + c[0][0];}
+Referência: Tipo.java; mini.y — indexa(), aritmetico(), atribui()
+
+## D3
+Permita a declaração de variáveis locais no início de main e dentro de blocos, alterando apenas a gramática. Mostre a alteração, execute make conflitos e teste com o programa abaixo, explicando cada aviso e a tabela mostrada pelo $MOSTRA_TS.
+Que estruturas mantidas “para futuras implementações” tornaram essa mudança tão pequena?
+int a, m[2][2];void main() {int a;a = 1;{ double a; int k; a = 2.5; k = m[1][0]; $MOSTRA_TS }int m;}
+Referência: mini.y — itens, declaraVars(), declara()
+
+## D4
+Desafio (opcional): faça o verificador detectar índices constantes fora dos limites, como v[7] com int v[5] ou m[1][4] com double m[3][4]. Hoje o atributo de expr é apenas um Tipo. Que informação precisaria ser acrescentada? Descreva (e, se possível, implemente) a solução e diga por que ela não resolve v[i] com i variável.
+Referência: mini.y — expr, indexa(); slide “Responsabilidades da tabela de símbolos” (dobramento de constantes)
