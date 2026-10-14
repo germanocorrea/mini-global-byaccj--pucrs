@@ -1,0 +1,7 @@
+int a, t[2][5], b;
+$TRACE_ON
+
+void main() {
+}
+
+$MOSTRA_TS
