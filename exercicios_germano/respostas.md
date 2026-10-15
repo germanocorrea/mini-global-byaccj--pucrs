@@ -237,7 +237,78 @@ A previsão foi certeira, mas acabo se aprofundando muito na linha 10, ao passo 
 Permita a declaração de variáveis locais no início de main e dentro de blocos, alterando apenas a gramática. Mostre a alteração, execute make conflitos e teste com o programa abaixo, explicando cada aviso e a tabela mostrada pelo $MOSTRA_TS.
 Que estruturas mantidas “para futuras implementações” tornaram essa mudança tão pequena?
 int a, m[2][2];void main() {int a;a = 1;{ double a; int k; a = 2.5; k = m[1][0]; $MOSTRA_TS }int m;}
-Referência: mini.y — itens, declaraVars(), declara()
+
+Alteração apenas em itens, passando a valer em todas estruturas solicitadas:
+```mini
+itens      : /* vazio */
+           | itens cmd
+           | itens diretiva
+           | itens decl_var
+           ;
+```
+
+```bash
+λ ~/org/pucrs/CC/mini-global-byaccj/ main* make conflitos
+byaccj -v -J -Jnorun mini.y
+Nenhum conflito na gramática.
+λ ~/org/pucrs/CC/mini-global-byaccj/ main*
+λ ~/org/pucrs/CC/mini-global-byaccj/ main* java Parser -v -t  exercicios_germano/exercicios/D3.mini
+Picked up _JAVA_OPTIONS: -Dsun.java2d.uiScale=2
+[ts] linha   1  abre escopo 'global' (nível 0)
+[ts] linha   2  insere a : VAR_GLOBAL int no escopo 'global'
+[ts] linha   2  insere m : VAR_GLOBAL int[2][2] no escopo 'global'
+[ts] linha   3  insere main : FUNCAO (retorno void) no escopo 'global'
+[ts] linha   3    abre escopo 'função main' (nível 1)
+Linha 4: aviso: 'a' oculta a declaração da linha 2
+[ts] linha   4    insere a : VAR_LOCAL int no escopo 'função main'
+[ts] linha   5    resolve a → a@4  (VAR_LOCAL int, nível 1)
+[ts] linha   6      abre escopo 'bloco' (nível 2)
+Linha 7: aviso: 'a' oculta a declaração da linha 4
+[ts] linha   7      insere a : VAR_LOCAL double no escopo 'bloco'
+[ts] linha   8      insere k : VAR_LOCAL int no escopo 'bloco'
+[ts] linha   9      resolve a → a@7  (VAR_LOCAL double, nível 2)
+[ts] linha  10      resolve m → m@2  (VAR_GLOBAL int[2][2], nível 0)
+[ts] linha  10      resolve k → k@8  (VAR_LOCAL int, nível 2)
+╔══ Tabela de símbolos na linha 11 — 3 escopo(s) aberto(s)
+║ [nível 2] bloco   ← topo
+║     a        VAR_LOCAL  double                 nível 2  (linha 7)
+║     k        VAR_LOCAL  int                    nível 2  (linha 8)
+║ [nível 1] função main
+║     a        VAR_LOCAL  int                    nível 1  (linha 4)
+║ [nível 0] global
+║     a        VAR_GLOBAL int                    nível 0  (linha 2)
+║     m        VAR_GLOBAL int[2][2]              nível 0  (linha 2)
+║     main     FUNCAO     [] -> void             nível 0  (linha 3)
+╚══
+  ┌─ fechando escopo 'bloco' (nível 2)
+  │ a        VAR_LOCAL  double                 nível 2  (linha 7)
+  │ k        VAR_LOCAL  int                    nível 2  (linha 8)
+  └─
+[ts] linha  12      fecha escopo 'bloco' (nível 2) — 2 símbolo(s) descartado(s)
+Linha 13: aviso: 'm' oculta a declaração da linha 2
+[ts] linha  13    insere m : VAR_LOCAL int no escopo 'função main'
+  ┌─ fechando escopo 'função main' (nível 1)
+  │ a        VAR_LOCAL  int                    nível 1  (linha 4)
+  │ m        VAR_LOCAL  int                    nível 1  (linha 13)
+  └─
+[ts] linha  14    fecha escopo 'função main' (nível 1) — 2 símbolo(s) descartado(s)
+  ┌─ fechando escopo 'global' (nível 0)
+  │ a        VAR_GLOBAL int                    nível 0  (linha 2)
+  │ m        VAR_GLOBAL int[2][2]              nível 0  (linha 2)
+  │ main     FUNCAO     [] -> void             nível 0  (linha 3)
+  └─
+[ts] linha  15  fecha escopo 'global' (nível 0) — 3 símbolo(s) descartado(s)
+Programa semanticamente correto.
+λ ~/org/pucrs/CC/mini-global-byaccj/ main*```
+
+Aviso da linha 4: a declaração da variável 'a' oculta uma variável 'a' declarada no escopo global.
+Aviso da linha 7: o mesmo ocorre, a variável 'a' declarada nesse bloco oculta a variável declarada no escopo main.
+Aviso da linha 13: a declaração de uma variável 'm' oculta uma variável 'm' declarada já no escopo global. Esse escopo é da função main, pois já se fechou o escopo do bloco que havia sido aberto.
+A tabela de simbolos printada mostra as variáveis declaradas em cada escopo. No bloco, o nivel mais interno, há uma variável 'a' e outra 'k'. 'a' oculta 2 variáveis declaradas em escopos "mais altos". A função main declara apenas uma variável 'a' naquele momento, que oculta o escopo de uma 'a' declarada globalmente. Outras declarações da main não aparecem porque ainda não ocorreram. No escopo global, há a declaração de outras entidades: a, m e a função main.
+
+As estruturas mantidas para futuras implementações são o controle de escopos da tabela de simbolos, principalmente. Assim, só alterar a gramática era necessário.
+
+
 
 ## D4
 Desafio (opcional): faça o verificador detectar índices constantes fora dos limites, como v[7] com int v[5] ou m[1][4] com double m[3][4]. Hoje o atributo de expr é apenas um Tipo. Que informação precisaria ser acrescentada? Descreva (e, se possível, implemente) a solução e diga por que ela não resolve v[i] com i variável.
